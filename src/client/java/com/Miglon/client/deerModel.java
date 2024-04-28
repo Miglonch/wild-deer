@@ -55,7 +55,7 @@ public class deerModel<T extends DeerEntity> extends SinglePartEntityModel<T> {
 	}
 	@Override
 	public void setAngles(DeerEntity entity, float f, float g, float h, float i, float j) {
-		switch (entity.getHornType()){
+		switch (entity.getAntlersType()){
 			case 0:
 				this.deer.getChild("horn").getChild("little_horn").visible = false;
 				this.deer.getChild("horn").getChild("middle_horn").visible = false;

@@ -5,10 +5,6 @@ import com.Miglon.Entities.custom.DeerAttackGoal;
 import com.Miglon.Entities.custom.DeerVariant;
 import com.Miglon.Items.ModItems;
 import com.Miglon.gen.ModTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CropBlock;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -32,11 +28,7 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
@@ -44,7 +36,6 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.Random;
 import java.util.UUID;
 
 
@@ -56,9 +47,12 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
     private UUID angryAt;
 
     private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(ModItems.REINDEER_MOSS, Items.KELP);
+    private int growAntlersTime;
 
     public DeerEntity(EntityType<? extends DeerEntity> entityType, World world) {
         super(entityType, world);
+        this.growAntlersTime = this.random.nextInt(3000) + 3000;
+        this.AGE = this.random.nextInt(3);
     }
 
     protected void initGoals(){
@@ -85,8 +79,34 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
     }
 
     static {
-        ANGER_TIME = DataTracker.registerData(WolfEntity.class, TrackedDataHandlerRegistry.INTEGER);
+        ANGER_TIME = DataTracker.registerData(DeerEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
+    }
+
+    @Override
+    public void tickMovement() {
+        super.tickMovement();
+        if (this.getWorld().isClient || !this.isAlive()) {
+            return;
+        }
+        if (this.random.nextInt(900) == 0 && this.deathTime == 0) {
+            this.heal(1.0f);
+        }
+        this.walkToParent();
+        if (!this.getWorld().isClient && this.isAlive() && !this.isBaby() && --this.growAntlersTime <= 0) {
+            this.playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
+            if (this.isMature()) {
+                this.dropItem(Items.STICK);
+                this.emitGameEvent(GameEvent.ENTITY_PLACE);
+                this.growAntlersTime = this.random.nextInt(3000) + 3000;
+                this.removeAntlers();
+            }
+            else {
+                this.AGE++;
+                this.growAntlersTime = this.random.nextInt(3000) + 3000;
+                addAntlers();
+            }
+        }
     }
 
     /*SOUND*/
@@ -149,19 +169,19 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
         super.initDataTracker();
         this.dataTracker.startTracking(ANGER_TIME, 0);
         this.dataTracker.startTracking(DATA_ID_TYPE_VARIANT, 0);
-        this.dataTracker.startTracking(HORN, randomHorn);
+        this.dataTracker.startTracking(ANTLERS, AGE);
     }
 
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("Variant", this.getTypeVariant());
-        nbt.putInt("TypeHorn", this.getHornType());
+        nbt.putInt("TypeAntlers", this.getAntlersType());
     }
 
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(DATA_ID_TYPE_VARIANT, nbt.getInt("Variant"));
-        this.dataTracker.set(HORN, nbt.getInt("TypeHorn"));
+        this.dataTracker.set(ANTLERS, nbt.getInt("TypeAntlers"));
     }
 
     protected float getBaseMovementSpeedMultiplier() {
@@ -297,85 +317,41 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
     }
 
 
-    /*HORNS*/
-    public static final IntProperty AGE = Properties.AGE_7;
-    public static final int MAX_AGE = 7;
-    private static final int MAX_HORN = 3;
-    private static final TrackedData<Integer> HORN =
+    /*ANTLERS*/
+    public static final int MAX_AGE = 3;
+    private static final TrackedData<Integer> ANTLERS =
             DataTracker.registerData(DeerEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
-    private final int randomHorn = new Random().nextInt(3);
+    private int AGE;
 
-    public void addHorns() {
-        this.dataTracker.set(HORN, randomHorn);
+    public void addAntlers() {
+        this.dataTracker.set(ANTLERS, AGE);
     }
 
-    public void removeHorns() {
-        this.dataTracker.set(HORN, 0);
+    public void removeAntlers() {
+        this.AGE = 0;
+        this.dataTracker.set(ANTLERS, 0);
     }
 
-    public int hasHorn() {
-        return (int) dataTracker.get(HORN);
-    }
-
-    public int getHornType() { return dataTracker.get(HORN);}
-
-    public int getMaxHorn() { return MAX_HORN; }
+    public int getAntlersType() { return dataTracker.get(ANTLERS);}
 
     protected void onGrowUp() {
         if (this.isBaby()) {
-            this.removeHorns();
+            this.removeAntlers();
         } else {
-            this.addHorns();
+            this.addAntlers();
         }
     }
 
-    /*AGE_HORN*/
+    /*age_antlers*/
 
-   /* protected IntProperty getAgeProperty() {
-        return AGE;
+    protected int getAge() { return AGE; }
+
+    public int getMaxAge() { return MAX_AGE; }
+
+    public final boolean isMature() {
+        return this.getAge() >= this.getMaxAge();
     }
-
-    public int getMaxAge() {
-        return MAX_AGE;
-    }
-
-    public int getAge(BlockState state) {
-        return state.get(this.getAgeProperty());
-    }
-
-    public BlockState withAge(int age) {
-        return HORN.getDefaultState().with(this.getAgeProperty(), age);
-    }
-
-    public final boolean isMature(BlockState state) {
-        return this.getAge(state) >= this.getMaxAge();
-    }
-
-    public boolean hasRandomTicks(BlockState state) {
-        return !this.isMature(state);
-    }
-
-    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, net.minecraft.util.math.random.Random random) {
-        float f;
-        int i;
-        if (world.getBaseLightLevel(pos, 0) >= 9 && (i = this.getAge(state)) < this.getMaxAge() && random.nextInt((int)(25.0f / (f = CropBlock.getAvailableMoisture(this, world, pos))) + 1) == 0) {
-            world.setBlockState(pos, this.withAge(i + 1), Block.NOTIFY_LISTENERS);
-        }
-    }
-
-    public void applyGrowth(World world, BlockPos pos, BlockState state) {
-        int j;
-        int i = this.getAge(state) + this.getGrowthAmount(world);
-        if (i > (j = this.getMaxAge())) {
-            i = j;
-        }
-        world.setBlockState(pos, this.withAge(i), Block.NOTIFY_LISTENERS);
-    }
-
-    protected int getGrowthAmount(World world) {
-        return MathHelper.nextInt(world.random, 2, 5);
-    }*/
 
     /*VARIANTS*/
     private static final TrackedData<Integer> DATA_ID_TYPE_VARIANT =
