@@ -30,7 +30,7 @@ public class DeerMod implements ModInitializer {
 			Registries.ENTITY_TYPE,
 			new Identifier(DeerMod.MODID, "deer"),
 			FabricEntityTypeBuilder.<DeerEntity>create(SpawnGroup.CREATURE, DeerEntity::new)
-					.dimensions(EntityDimensions.fixed(0.5F, 1F))
+					.dimensions(EntityDimensions.fixed(1.25F, 1.5F))
 					.build()
 	);
 

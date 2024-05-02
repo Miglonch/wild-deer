@@ -65,7 +65,7 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(8, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
         this.goalSelector.add(9, new LookAroundGoal(this));
-        this.targetSelector.add(1, revengeGoal = (new  RevengeGoal(this, new Class[0])));
+        this.targetSelector.add(0, revengeGoal = (new  RevengeGoal(this, new Class[0])));
     }
 
     public static DefaultAttributeContainer.Builder createDeerAttributes() {
@@ -83,22 +83,20 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
         ANGER_TIME_RANGE = TimeHelper.betweenSeconds(20, 39);
     }
 
+
     @Override
     public void tickMovement() {
         super.tickMovement();
         if (this.getWorld().isClient || !this.isAlive()) {
             return;
         }
-        if (this.random.nextInt(900) == 0 && this.deathTime == 0) {
-            this.heal(1.0f);
-        }
         this.walkToParent();
         if (!this.getWorld().isClient && this.isAlive() && !this.isBaby() && --this.growAntlersTime <= 0) {
-            this.playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
             if (this.isMature()) {
                 this.dropItem(Items.STICK);
                 this.emitGameEvent(GameEvent.ENTITY_PLACE);
                 this.growAntlersTime = this.random.nextInt(3000) + 3000;
+                this.playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
                 this.removeAntlers();
             }
             else {
@@ -176,12 +174,14 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("Variant", this.getTypeVariant());
         nbt.putInt("TypeAntlers", this.getAntlersType());
+        this.writeAngerToNbt(nbt);
     }
 
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.dataTracker.set(DATA_ID_TYPE_VARIANT, nbt.getInt("Variant"));
         this.dataTracker.set(ANTLERS, nbt.getInt("TypeAntlers"));
+        this.readAngerFromNbt(this.getWorld(), nbt);
     }
 
     protected float getBaseMovementSpeedMultiplier() {
@@ -286,11 +286,6 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
         }
     }
 
-    @Override
-    public EntityView method_48926() {
-        return null;
-    }
-
     /*ANGRY*/
 
     @Override
@@ -362,10 +357,10 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
                                  SpawnReason spawnReason, @Nullable EntityData entityData,
                                  @Nullable NbtCompound entityNbt) {
         RegistryEntry<Biome> registryEntry = world.getBiome(this.getBlockPos());
-        if (registryEntry.isIn(ModTags.Biomes.SPAWNS_COLD_VARIANT_DEERS)) {
-            this.setVariant(DeerVariant.COLD);
-        } else if (registryEntry.isIn(ModTags.Biomes.SPAWNS_ICE_VARIANT_DEERS)) {
-            this.setVariant(DeerVariant.ICE);
+        if (registryEntry.isIn(ModTags.Biomes.SPAWNS_CHERRY_VARIANT_DEERS)) {
+            this.setVariant(DeerVariant.CHERRY);
+        } else if (registryEntry.isIn(ModTags.Biomes.SPAWNS_COLD_VARIANT_DEERS)) {
+            this.setVariant(DeerVariant.NORTH);
         } else {
             this.setVariant(DeerVariant.DEFAULT);
         }
@@ -384,5 +379,10 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
 
     public void setVariant(DeerVariant variant) {
         this.dataTracker.set(DATA_ID_TYPE_VARIANT, variant.getId() & 255);
+    }
+
+    @Override
+    public EntityView method_48926() {
+        return null;
     }
 }

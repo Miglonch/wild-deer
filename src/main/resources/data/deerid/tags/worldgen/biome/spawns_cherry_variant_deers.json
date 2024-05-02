@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "minecraft:snowy_plains",
+    "minecraft:cherry_grove",
     {
-      "id": "#c:snowy_plains",
+      "id": "#c:cherry_grove",
       "required": false
     }
   ]

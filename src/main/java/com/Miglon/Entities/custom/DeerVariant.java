@@ -6,8 +6,8 @@ import java.util.Comparator;
 
 public enum DeerVariant {
     DEFAULT(0),
-    ICE(1),
-    COLD(2);
+    NORTH(1),
+    CHERRY(2);
 
 
     private static final DeerVariant[] BY_ID = Arrays.stream(values()).sorted(Comparator.

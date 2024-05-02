@@ -18,11 +18,11 @@ public class DeerRenderer extends MobEntityRenderer<DeerEntity, deerModel<DeerEn
     public static final Map<DeerVariant, Identifier> LOCATION_BY_VARIANT =
             Util.make(Maps.newEnumMap(DeerVariant.class), (map) -> {
                 map.put(DeerVariant.DEFAULT,
-                        new Identifier(DeerMod.MODID, "textures/entity/deer/deer.png"));
-                map.put(DeerVariant.ICE,
-                        new Identifier(DeerMod.MODID, "textures/entity/deer/icedeer.png"));
-                map.put(DeerVariant.COLD,
-                        new Identifier(DeerMod.MODID, "textures/entity/deer/colddeer.png"));
+                        new Identifier(DeerMod.MODID, "textures/entity/deer/default.png"));
+                map.put(DeerVariant.NORTH,
+                        new Identifier(DeerMod.MODID, "textures/entity/deer/north.png"));
+                map.put(DeerVariant.CHERRY,
+                        new Identifier(DeerMod.MODID, "textures/entity/deer/cherry.png"));
             });
 
     public DeerRenderer(EntityRendererFactory.Context context) {
