@@ -1,5 +1,6 @@
 package com.Miglon;
 
+import com.Miglon.Blocks.ModBlocks;
 import com.Miglon.Entities.DeerEntity;
 import com.Miglon.Items.ModItems;
 import com.Miglon.gen.ModWorldGeneration;
@@ -49,5 +50,6 @@ public class DeerMod implements ModInitializer {
 		ModWorldGeneration.generateModWorldGen();
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(DeerMod::addItemsToSpawnEggsTabItemGroup);
 		ModItems.registerModItems();
+		ModBlocks.registerModBlocks();
 	}
 }

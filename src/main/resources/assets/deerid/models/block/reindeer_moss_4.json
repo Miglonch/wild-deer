@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/flowerbed_4",
+  "textures": {
+    "flowerbed": "deerid:block/reindeer_moss",
+    "stem": "deerid:block/reindeer_moss_stem"
+  }
+}

@@ -11,8 +11,10 @@ import net.minecraft.world.biome.BiomeKeys;
 
 public class ModEntityGeneration {
     public static void addSpawns(){
-        BiomeModifications.addSpawn(BiomeSelectors.includeByKey(BiomeKeys.TAIGA, BiomeKeys.CHERRY_GROVE, BiomeKeys.SNOWY_TAIGA, BiomeKeys.OLD_GROWTH_SPRUCE_TAIGA,BiomeKeys.OLD_GROWTH_PINE_TAIGA), SpawnGroup.CREATURE,
-                DeerMod.DEER_ENTITY, 40, 1, 3);
+        BiomeModifications.addSpawn(BiomeSelectors.includeByKey(BiomeKeys.TAIGA, BiomeKeys.SNOWY_TAIGA, BiomeKeys.OLD_GROWTH_SPRUCE_TAIGA,BiomeKeys.OLD_GROWTH_PINE_TAIGA), SpawnGroup.CREATURE,
+                DeerMod.DEER_ENTITY, 30, 1, 2);
+        BiomeModifications.addSpawn(BiomeSelectors.includeByKey(BiomeKeys.CHERRY_GROVE), SpawnGroup.CREATURE,
+                DeerMod.DEER_ENTITY, 1, 1, 1);
 
         SpawnRestriction.register(DeerMod.DEER_ENTITY, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::isValidNaturalSpawn);
     }
