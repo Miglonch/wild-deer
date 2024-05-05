@@ -1,9 +1,9 @@
 package com.Miglon.Entities;
 
+import com.Miglon.Blocks.ModBlocks;
 import com.Miglon.DeerMod;
 import com.Miglon.Entities.custom.DeerAttackGoal;
 import com.Miglon.Entities.custom.DeerVariant;
-import com.Miglon.Items.ModItems;
 import com.Miglon.gen.ModTags;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
@@ -46,7 +46,7 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
     @Nullable
     private UUID angryAt;
 
-    private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(ModItems.REINDEER_MOSS, Items.KELP);
+    private static final Ingredient BREEDING_INGREDIENT = Ingredient.ofItems(ModBlocks.REINDEER_MOSS, Items.KELP);
     private int growAntlersTime;
 
     public DeerEntity(EntityType<? extends DeerEntity> entityType, World world) {
@@ -60,7 +60,7 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
         this.goalSelector.add(1, new HorseBondWithPlayerGoal(this, 1.2));
         this.goalSelector.add(3, new DeerAttackGoal(this, 1.2, true));
         this.goalSelector.add(4, new AnimalMateGoal(this, 1.0));
-        this.goalSelector.add(5, new TemptGoal(this, 1.25, Ingredient.ofItems(new ItemConvertible[]{ModItems.REINDEER_MOSS}), false));
+        this.goalSelector.add(5, new TemptGoal(this, 1.25, Ingredient.ofItems(new ItemConvertible[]{ModBlocks.REINDEER_MOSS}), false));
         this.goalSelector.add(6, new FollowParentGoal(this, 1.25));
         this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(8, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
@@ -198,7 +198,7 @@ public class DeerEntity extends AbstractHorseEntity implements Angerable {
             f = 2.0f;
             i = 20;
             j = 3;
-        } else if (item.isOf(ModItems.REINDEER_MOSS)) {
+        } else if (item.isOf(ModBlocks.REINDEER_MOSS.asItem())) {
             f = 2.0F;
             i = 20;
             j = 3;
